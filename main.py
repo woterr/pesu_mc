@@ -70,12 +70,12 @@ async def check_server():
         print(f'Error checking server status: {e}')
 
 async def shutdown_server(manual=False):
-    headers = {"Authorization": f"Bearer {token}","Content-Type": "application/json"}
+    headers = {"Authorization": f"Bearer {CRAFTY_TOKEN}","Content-Type": "application/json"}
     channel = discord.utils.get(bot.get_all_channels(), name='dev-chat')
     if channel:
         if manual:
             await channel.send('Server stop command received from admin. Stopping Minecraft server...')
-            await mc_server = requests.post("https://pesu-mc.ddns.net:8443/api/v2/servers/1/action/stop_server", headers=headers, verify=False)
+            requests.post("https://pesu-mc.ddns.net:8443/api/v2/servers/1/action/stop_server", headers=headers, verify=False)
         else:
             await channel.send('Server has been empty for 5 minutes. Initiating automatic shutdown sequence.')
     print('Shutting down server...')

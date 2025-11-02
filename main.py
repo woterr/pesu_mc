@@ -83,7 +83,8 @@ async def shutdown_server(manual=False):
             await channel.send('Server stop command received from admin. Stopping Minecraft server...')
             await requests.post(f"https://pesu-mc.ddns.net:8443/api/v2/servers/{SERVER_ID}/action/stop_server", headers=headers, verify=False)
         else:
-            await channel.send('Server has been empty for 5 minutes. Initiating automatic shutdown sequence.')
+            await channel.send('Server has been empty for 1 minute. Initiating automatic shutdown sequence.')
+            await requests.post(f"https://pesu-mc.ddns.net:8443/api/v2/servers/{SERVER_ID}/action/stop_server", headers=headers, verify=False)
     print('Shutting down server...')
     
 

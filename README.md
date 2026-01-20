@@ -1,8 +1,0 @@
----
-title: PESU-MC Bot
-emoji: 🧱
-colorFrom: indigo
-colorTo: blue
-sdk: docker
-pinned: false
----

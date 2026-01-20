@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+import yaml
+
 from mcstatus import JavaServer
 import asyncio
 import os
@@ -9,22 +11,31 @@ import base64
 import aiohttp
 
 load_dotenv()
-ADMIN_ID = [int(rid.strip()) for rid in os.getenv("ADMIN_ID").split(",")]
-SERVER_IP = os.getenv('SERVER_IP')
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+ADMIN_ID = config['bot']['ADMIN_ID'].split(",")
+
+SERVER_IP = config['crafty']['SERVER_IP']
+SERVER_ID = config['crafty']['SERVER_ID']
+
+PROJECT_ID = config['gcp']['PROJECT_ID']
+ZONE =  config['gcp']['ZONE']
+INSTANCE_NAME = config['gcp']['INSTANCE_NAME']
+
 GOOGLE_SERVICE_ACCOUNT_BASE64 = os.getenv("GOOGLE_SERVICE_ACCOUNT_BASE64")
-PROJECT_ID = os.getenv("PROJECT_ID")
-ZONE = os.getenv("ZONE")
-INSTANCE_NAME = os.getenv("INSTANCE_NAME")
 CRAFTY_TOKEN = os.getenv('CRAFTY_TOKEN')
-SERVER_ID = os.getenv('SERVER_ID')
 
 
 key_json = json.loads(base64.b64decode(GOOGLE_SERVICE_ACCOUNT_BASE64))
 credentials = service_account.Credentials.from_service_account_info(key_json)
 instances_client = compute_v1.InstancesClient(credentials=credentials)
 
+
 def is_admin(ctx):
-    return any(role.id in ADMIN_ID for role in ctx.author.roles)
+    for role in ctx.author.roles:
+        if str(role.id) in ADMIN_ID:
+            return True
 
 async def get_player_count():
     """Run blocking mcstatus code in a background thread."""

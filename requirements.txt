@@ -3,3 +3,5 @@ mcstatus
 python-dotenv 
 google-cloud-compute
 google-auth
+flask
+pyyaml

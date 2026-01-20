@@ -1,0 +1,11 @@
+gcp:
+  PROJECT_ID: "loyal-polymer-476307-g9"
+  ZONE: "asia-south1-c"
+  INSTANCE_NAME: "pesumc-s2"
+
+crafty:
+  SERVER_ID: "b228daeb-b24a-43ed-b8f8-ab48b44ce5eb"
+  SERVER_IP: "pesu-mc.ddns.net"
+
+bot:
+  ADMIN_ID: "1456845605476368598,1456845605476368598"

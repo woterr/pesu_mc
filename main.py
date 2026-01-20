@@ -1,14 +1,14 @@
 import os
-import asyncio
+from dotenv import load_dotenv
+
 import discord
 from discord.ext import commands, tasks
-from dotenv import load_dotenv
 from datetime import datetime
-from google.cloud import compute_v1
-from google.oauth2 import service_account
-from utils import is_admin, get_player_count, start_vm, stop_vm, stop_mc_server, get_vm_status
-import aiohttp 
 
+from utils import is_admin, get_player_count, start_vm, stop_vm, stop_mc_server, get_vm_status
+from webserver import run_webserver
+
+import threading
 
 load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
@@ -76,20 +76,13 @@ async def shutdown_server(manual=False):
         if manual:
             await channel.send('Server stop command received from admin. Stopping Minecraft server...')
         else:
-            await channel.send('Server has been empty for 1 minute. Initiating automatic shutdown sequence.')
+            await channel.send('Server has been empty for 1 minute. Initiating automatic shutdown.')
         await stop_mc_server()
         await channel.send("Server stopped. Turning off vm now")
         await stop_vm()
         await channel.send("Vm has been turned off")
-    
-
-@bot.command()
-async def ping(ctx):
-    await ctx.reply("pong")
-
-@bot.command()
-async def josh(ctx):
-    await ctx.reply("is dumass")
 
 
+
+threading.Thread(target=run_webserver).start()
 bot.run(BOT_TOKEN)

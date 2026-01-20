@@ -9,3 +9,7 @@ crafty:
 
 bot:
   ADMIN_ID: "1456845605476368598,1456845605476368598"
+
+stats:
+  POLL_INTERVAL: 10 # polling seconds for both stats and server check
+  DB_PATH: "metrics.db"

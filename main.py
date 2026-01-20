@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 import discord
 from discord.ext import commands, tasks
-from datetime import datetime
+from datetime import datetime, timezone
 
 from utils import is_admin, get_player_count, start_vm, stop_vm, stop_mc_server, get_vm_status
 from webserver import run_webserver

@@ -19,6 +19,13 @@ bot = commands.Bot(command_prefix='$', intents=intents)
 empty_time = None
 trigger_shutdown = False
 
+VOTE_EMOJI = "👍"
+REQUIRED_VOTES = 4
+
+active_vote_message_id = None
+current_votes = set()
+
+
 CLOCK = "<a:Minecraft_clock:1462830831092498671>"
 PARROT = "<a:dancing_parrot:1462833253692997797>"
 CHEST = "<a:MinecraftChestOpening:1462837623625355430>"
@@ -93,6 +100,18 @@ def embed_no_permission():
         timestamp=datetime.now(timezone.utc)
     ).set_footer(text="Xymic")
 
+def embed_vote_start():
+    return discord.Embed(
+        title="🗳️ Vote to Start Server",
+        description=(
+            f"React with {VOTE_EMOJI} to start the Minecraft server.\n\n"
+            f"Votes needed: **{REQUIRED_VOTES+1}**"
+        ),
+        color=discord.Color.blurple(),
+        timestamp=datetime.now(timezone.utc)
+    ).set_footer(text="Xymic")
+
+
 def embed_vm_stop():
     return discord.Embed(
         title="The VM has been stopped.",
@@ -105,15 +124,49 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
     check_server.start()
 
+@bot.event
+async def on_reaction_add(reaction, user):
+    global current_votes, active_vote_message_id
+
+    if user.bot:
+        return
+    if active_vote_message_id is None:
+        return
+    if reaction.message.id != active_vote_message_id:
+        return
+    if str(reaction.emoji) != VOTE_EMOJI:
+        return
+    if user.id in current_votes:
+        return
+
+    current_votes.add(user.id)
+
+    print(f"Votes: {len(current_votes)}/{REQUIRED_VOTES}")
+
+    if len(current_votes) >= REQUIRED_VOTES:
+        channel = reaction.message.channel
+        active_vote_message_id = None
+        current_votes.clear()
+
+        await channel.send(embed=embed_starting())
+        await start_vm()
+        await channel.send(embed=embed_started())
+
 
 @bot.command()
 async def start(ctx):
-    if not is_admin(ctx):
-        await ctx.reply(embed=embed_no_permission())
+    global active_vote_message_id, current_votes
+    if is_admin(ctx):
+        await ctx.reply(embed=embed_starting())
+        await start_vm()
+        await ctx.reply(embed=embed_started())
         return
-    await ctx.reply(embed=embed_starting())
-    await start_vm()
-    await ctx.reply(embed=embed_started())
+    
+    else:
+        current_votes = set()
+        vote_message = await ctx.reply(embed=embed_vote_start())
+        active_vote_message_id = vote_message.id
+        await vote_message.add_reaction(VOTE_EMOJI)
 
 @bot.command()
 async def stop(ctx):

@@ -524,8 +524,8 @@ async def stats_player(ctx, username):
     if not doc:
         await ctx.reply("Player not found.")
         return
-
-    online = bool(doc.get("online", False)) & await get_vm_status() == "RUNNING"
+    status = await get_vm_status() == "RUNNING"
+    online = bool(doc.get("online", False)) & status
     # online = bool(doc.get("online", False)) & "RUNNING" # DEBUG/TESTING
     embed = discord.Embed(
         title=f"Player Stats: {doc.get('name', 'Unknown')}",
